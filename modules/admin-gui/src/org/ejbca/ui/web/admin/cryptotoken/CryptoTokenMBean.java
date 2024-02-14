@@ -1151,7 +1151,7 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
                     ? getCurrentCryptoToken().getSecret1().toCharArray()
                     : AzureCryptoToken.DUMMY_ACTIVATION_CODE.toCharArray();
             if (getCurrentCryptoTokenId() == 0) {
-                if (secret.length > 0) {
+                if (secret.length > 0 || AwsCloudHsmCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType())) {
                     if (getCurrentCryptoToken().isAutoActivate()) {
                         BaseCryptoToken.setAutoActivatePin(properties, new String(secret), true);
                     }

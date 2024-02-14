@@ -81,7 +81,6 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
     public static final String NODEFAULTPWD = "NODEFAULTPWD";
 
     private byte[] keystoreData;
-    private char[] keyStorePass;
 
     public AwsCloudHsmCryptoToken() {
         super();
@@ -132,10 +131,8 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
         }
         if (keystoreData != null) {
             try {
-                KeyStore keystore = loadKeyStore(keystoreData, authCode);
+                KeyStore keystore = loadKeyStore(keystoreData, new char[0]);
                 setKeyStore(keystore);
-                // If everything was OK we cache the load/save password so we can store the keystore
-                keyStorePass = authCode;
             } catch (IOException e) {
                 String msg = intres.getLocalizedMessage("token.erroractivate", getId(), e.getMessage());
                 log.info(msg, e);
@@ -160,7 +157,6 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
                 //keystore.load(null, authCode);
                 setKeyStore(keystore);
                 // If everything was OK we cache the load/save password so we can store the keystore
-                keyStorePass = authCode;
                 storeKeyStore();
             } catch (KeyStoreException e) {
                 log.error(e);
@@ -245,7 +241,7 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try {
             if (keyStore != null) {
-                this.keyStore.store(baos, keyStorePass);
+                this.keyStore.store(baos, new char[0]);
                 this.keystoreData = baos.toByteArray();
             }
         } catch (KeyStoreException e) {
@@ -336,7 +332,7 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
                 final java.security.cert.Certificate[] chain = new java.security.cert.Certificate[] {selfSignedCert};
                 final KeyStore.PrivateKeyEntry entry = new KeyStore.PrivateKeyEntry(keyPair.getPrivate(), chain);
 
-                getKeyStore().setEntry(alias, entry, new KeyStore.PasswordProtection(keyStorePass));
+                getKeyStore().setEntry(alias, entry, new KeyStore.PasswordProtection(new char[0]));
 
                 storeKeyStore();
             } catch (AddAttributeException | NoSuchAlgorithmException | NoSuchProviderException | CertificateException | OperatorCreationException | KeyStoreException e) {
