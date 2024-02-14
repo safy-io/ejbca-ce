@@ -481,6 +481,8 @@
 		<path refid="lib.bouncycastle-util.classpath"/>
 	</path>
 
+	<path id="lib.cloudhsm-jce.classpath"><fileset dir="${ejbca.home}/lib"><include name="cloudhsm-jce-*.jar"/></fileset></path>
+
 	<path id="lib.jpa.classpath">
         <fileset dir="${ejbca.home}/lib/hibernate">
             <include name="antlr-*.jar"/>

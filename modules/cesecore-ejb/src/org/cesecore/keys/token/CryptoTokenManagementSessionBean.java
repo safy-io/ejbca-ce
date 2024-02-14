@@ -667,7 +667,7 @@ public class CryptoTokenManagementSessionBean implements CryptoTokenManagementSe
             // This is a NOOP call that will not lead to any change
             return false;
         }
-        if (SoftCryptoToken.class.getName().equals(cryptoToken.getClass().getName())) {
+        if (SoftCryptoToken.class.getName().equals(cryptoToken.getClass().getName()) || AwsCloudHsmCryptoToken.class.getName().equals(cryptoToken.getClass().getName())) {
             CryptoProviderTools.installBCProviderIfNotAvailable();
             final KeyStore keystore;
             try {

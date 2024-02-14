@@ -65,6 +65,7 @@ public class CryptoTokenFactory {
             instance.addAvailableCryptoToken(PRIME_CA_TOKEN_NAME, PRIME_CA_TOKEN_SIMPLE_NAME, false, true);
             instance.addAvailableCryptoToken(PKCS11CryptoToken.class.getName(), "PKCS#11", false, true);
             instance.addAvailableCryptoToken(SoftCryptoToken.class.getName(), "SOFT", true, true);
+            instance.addAvailableCryptoToken(AwsCloudHsmCryptoToken.class.getName(), "AWS CloudHSM", false, true);
             instance.addAvailableCryptoToken(NullCryptoToken.class.getName(), "Null", false, false);
             instance.addAvailableCryptoToken(AzureCryptoToken.class.getName(), "Azure Key Vault", false, true);
             // Enterprise only. May not be available don't reference class.

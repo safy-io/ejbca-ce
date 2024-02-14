@@ -18,6 +18,7 @@
 		<path refid="lib.javassist.classpath"/>
 		<path refid="lib.cert-cvc.classpath"/>
 		<path refid="lib.bouncycastle.classpath"/>
+		<path refid="lib.cloudhsm-jce.classpath"/>
 		<path refid="lib.log4j.classpath"/>
 		<path refid="lib.commons-logging.classpath"/>
 		<path refid="lib.commons-codec.classpath"/>
