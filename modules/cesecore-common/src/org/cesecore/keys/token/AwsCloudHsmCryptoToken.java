@@ -319,7 +319,10 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
                 final KeyAttributesMap requiredPublicKeyAttributes =
                     new KeyAttributesMapBuilder().put(KeyAttribute.VERIFY, true).build();
                 final KeyAttributesMap requiredPrivateKeyAttributes =
-                    new KeyAttributesMapBuilder().put(KeyAttribute.SIGN, true).build();
+                    new KeyAttributesMapBuilder()
+                        .put(KeyAttribute.PRIVATE, true)
+                        .put(KeyAttribute.SIGN, true)
+                        .build();
                 final KeyPair keyPair =
                     AsymmetricKeys.generateRSAKeyPair(
                         Integer.parseInt(keySpec.trim()),
