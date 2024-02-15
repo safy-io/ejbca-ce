@@ -316,6 +316,7 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
             CryptoTokenOfflineException {
         if (StringUtils.isNotEmpty(alias)) {
             try {
+                // Source code from https://github.com/aws-samples/aws-cloudhsm-jce-examples/blob/c57ad1bd140598440b945b1057973f84868bd6e8/src/main/java/com/amazonaws/cloudhsm/examples/KeyStoreExampleRunner.java
                 final KeyAttributesMap requiredPublicKeyAttributes =
                     new KeyAttributesMapBuilder().put(KeyAttribute.VERIFY, true).build();
                 final KeyAttributesMap requiredPrivateKeyAttributes =
@@ -331,11 +332,15 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
                         requiredPrivateKeyAttributes);
 
                 /** Generate a dummy certificate and associate the chain with the private key. */
-                final java.security.cert.Certificate selfSignedCert = createAndSignCertificate(keyPair);
-                final java.security.cert.Certificate[] chain = new java.security.cert.Certificate[] {selfSignedCert};
+                final X509Certificate selfSignedCert = createAndSignCertificate(keyPair);
+                final X509Certificate[] chain = new X509Certificate[] {selfSignedCert};
                 final KeyStore.PrivateKeyEntry entry = new KeyStore.PrivateKeyEntry(keyPair.getPrivate(), chain);
 
-                getKeyStore().setEntry(alias, entry, new KeyStore.PasswordProtection(new char[0]));
+                getKeyStore().setEntry(
+                    alias,
+                    entry,
+                    new KeyStore.PasswordProtection(new char[0])
+                );
 
                 storeKeyStore();
             } catch (AddAttributeException | NoSuchAlgorithmException | NoSuchProviderException | CertificateException | OperatorCreationException | KeyStoreException e) {
