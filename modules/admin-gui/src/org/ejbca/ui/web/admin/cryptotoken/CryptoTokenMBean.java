@@ -233,6 +233,10 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
             return CryptoTokenFactory.AWSKMS_SIMPLE_NAME.equals(cryptoTokenInfo.getType());
         }
 
+        public boolean isAWSCloudHSM() {
+            return AwsCloudHsmCryptoToken.class.getSimpleName().equals(cryptoTokenInfo.getType());
+        }
+
         public boolean isRequiresSecretToActivate() {
             return requiresSecretToActivate;
         }

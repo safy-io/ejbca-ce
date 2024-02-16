@@ -96,26 +96,12 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
     public void init(Properties properties, final byte[] data, final int cryptoTokenId) {
         super.setJCAProviderName("CloudHSM");
         this.keystoreData = data;
-        if (properties == null) {
-            properties = new Properties();
+        init(properties, false, cryptoTokenId);
+        try {
+            activate(null);
+        } catch (Exception e) {
+            log.debug(e);
         }
-        // If we don't have an auto activation password set, we try to use the default one if it works to load the keystore with it
-        String autoPwd = BaseCryptoToken.getAutoActivatePin(properties);
-        if ((autoPwd == null) && (properties.getProperty(NODEFAULTPWD) == null)) {
-            final String keystorepass = StringTools.passwordDecryption(CesecoreConfiguration.getCaKeyStorePass(), "ca.keystorepass");
-            // Test it first, don't set an incorrect password as autoactivate password
-            boolean okPwd = checkSoftKeystorePassword(keystorepass.toCharArray(), cryptoTokenId);
-            if (okPwd) {
-                log.debug("Succeded to load keystore with password");
-                BaseCryptoToken.setAutoActivatePin(properties, keystorepass, true);
-            }
-        } else if (autoPwd != null) {
-            log.debug("Soft Crypto Token has autoactivation property set.");
-        } else if (properties.getProperty(NODEFAULTPWD) != null) {
-            log.debug("No default pwd allowed for this soft crypto token.");
-        }
-        boolean autoActivate = autoPwd != null || properties.getProperty(NODEFAULTPWD) == null;
-        init(properties, autoActivate, cryptoTokenId);
     }
 
     @Override
@@ -124,11 +110,7 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
             log.debug("Ignoring activation request for already active CryptoToken: " + getId());
             return;
         }
-        // If we use auto-activation, we will override whatever is used as parameter (probably null)
-        final String autoPwd = BaseCryptoToken.getAutoActivatePin(getProperties());
-        if (autoPwd!=null) {
-            authCode = autoPwd.toCharArray();
-        }
+
         if (keystoreData != null) {
             try {
                 KeyStore keystore = loadKeyStore(keystoreData, new char[0]);
@@ -171,41 +153,6 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
                 log.error(e);
                 throw new CryptoTokenAuthenticationFailedException(e.getMessage());
             }
-        }
-    }
-
-    /**
-     * Throws an exception if the export of this crypto token should be denied.
-     *
-     * @param authCode
-     * @throws CryptoTokenAuthenticationFailedException if the authentication code is incorrect.
-     * @throws CryptoTokenOfflineException if the crypto token is offline or an unknown error occurs.
-     * @throws PrivateKeyNotExtractableException if the crypto tokens does not allow it's keys to be extracted.
-     */
-    public void checkPasswordBeforeExport(char[] authCode) throws CryptoTokenAuthenticationFailedException, CryptoTokenOfflineException, PrivateKeyNotExtractableException {
-        if (!doPermitExtractablePrivateKey()) {
-            final String msg = intres.getLocalizedMessage("token.errornotextractable_allkeys", getId());
-            throw new PrivateKeyNotExtractableException(msg);
-        }
-        try {
-            if (authCode == null || authCode.length == 0) {
-                final String defaultpass = StringTools.passwordDecryption(CesecoreConfiguration.getCaKeyStorePass(), "ca.keystorepass");
-                loadKeyStore(keystoreData, defaultpass.toCharArray());
-            } else {
-                loadKeyStore(keystoreData, authCode);
-            }
-        } catch (IOException e) {
-            String msg = intres.getLocalizedMessage("token.wrongauthcode", getId(), e.getMessage());
-            log.info(msg, e);
-            CryptoTokenAuthenticationFailedException oe = new CryptoTokenAuthenticationFailedException(e.getMessage());
-            oe.initCause(e);
-            throw oe;
-        } catch (Exception e) {
-            String msg = intres.getLocalizedMessage("token.erroractivate", getId(), e.getMessage());
-            log.info(msg, e);
-            CryptoTokenOfflineException oe = new CryptoTokenOfflineException(e.getMessage());
-            oe.initCause(e);
-            throw oe;
         }
     }
 
@@ -262,29 +209,6 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
     public byte[] getTokenData() {
         storeKeyStore();
         return keystoreData;
-    }
-
-    /**
-     * Verifies the password for soft keystore by trying to load the keystore
-     *
-     * @param authenticationCode
-     *            authentication code for the keystore
-     * @return true if verification was ok
-     */
-    private boolean checkSoftKeystorePassword(final char[] authenticationCode, int cryptoTokenId) {
-        try {
-            if (keystoreData != null) {
-                KeyStore keystore = KeyStore.getInstance("CloudHSM");
-                keystore.load(new ByteArrayInputStream(keystoreData), authenticationCode);
-            }
-            return true;
-        } catch (Exception e) {
-            // If it was not the wrong password we need to see what went wrong
-            log.debug("Error: ", e);
-            // Invalid password
-            log.info(intres.getLocalizedMessage("token.wrongauthcode", cryptoTokenId));
-        }
-        return false;
     }
 
     @Override
