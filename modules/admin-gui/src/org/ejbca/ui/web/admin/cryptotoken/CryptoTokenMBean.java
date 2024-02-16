@@ -1155,8 +1155,9 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
                     ? getCurrentCryptoToken().getSecret1().toCharArray()
                     : AzureCryptoToken.DUMMY_ACTIVATION_CODE.toCharArray();
             if (getCurrentCryptoTokenId() == 0) {
-                if (secret.length > 0 || AwsCloudHsmCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType())) {
-                    if (getCurrentCryptoToken().isAutoActivate()) {
+                boolean isAwsCloudHsmCryptoToken = AwsCloudHsmCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType());
+                if (secret.length > 0 || isAwsCloudHsmCryptoToken) {
+                    if (getCurrentCryptoToken().isAutoActivate() || isAwsCloudHsmCryptoToken) {
                         BaseCryptoToken.setAutoActivatePin(properties, new String(secret), true);
                     }
                     currentCryptoTokenId = cryptoTokenManagementSession.createCryptoToken(authenticationToken, name, className, properties, null, secret);

@@ -200,8 +200,10 @@
                 </h:panelGroup>
                 
 				<h:outputLabel for="currentCryptoTokenAutoActivate"
-					value="#{web.text.CRYPTOTOKEN_AUTO}" />
-				<h:panelGroup>
+					value="#{web.text.CRYPTOTOKEN_AUTO}"
+					rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}" />
+				<h:panelGroup
+					rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}">
 					<h:selectBooleanCheckbox id="currentCryptoTokenAutoActivate"
 						value="#{cryptoTokenMBean.currentCryptoToken.autoActivate}"
 						disabled="#{!cryptoTokenMBean.currentCryptoTokenEditMode}" />

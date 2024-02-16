@@ -100,7 +100,7 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
         try {
             activate(null);
         } catch (Exception e) {
-            log.debug(e);
+            throw new RuntimeException("Unable to activate AWS CloudHSM crypto token " + cryptoTokenId, e);
         }
     }
 
