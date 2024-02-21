@@ -41,19 +41,7 @@ import org.cesecore.configuration.GlobalConfigurationSessionLocal;
 import org.cesecore.keybind.InternalKeyBindingInfo;
 import org.cesecore.keybind.InternalKeyBindingMgmtSessionLocal;
 import org.cesecore.keybind.impl.AuthenticationKeyBinding;
-import org.cesecore.keys.token.AvailableCryptoToken;
-import org.cesecore.keys.token.AwsKmsAuthenticationType;
-import org.cesecore.keys.token.AzureAuthenticationType;
-import org.cesecore.keys.token.AzureCryptoToken;
-import org.cesecore.keys.token.CryptoTokenConstants;
-import org.cesecore.keys.token.CryptoTokenFactory;
-import org.cesecore.keys.token.CryptoTokenInfo;
-import org.cesecore.keys.token.CryptoTokenManagementSession;
-import org.cesecore.keys.token.CryptoTokenManagementSessionLocal;
-import org.cesecore.keys.token.KeyPairInfo;
-import org.cesecore.keys.token.NullCryptoToken;
-import org.cesecore.keys.token.PKCS11CryptoToken;
-import org.cesecore.keys.token.SoftCryptoToken;
+import org.cesecore.keys.token.*;
 import org.ejbca.config.AcmeConfiguration;
 import org.ejbca.config.GlobalAcmeConfiguration;
 import org.ejbca.config.WebConfiguration;
@@ -241,6 +229,10 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
 
         public boolean isAWSKMSType() {
             return CryptoTokenFactory.AWSKMS_SIMPLE_NAME.equals(cryptoTokenInfo.getType());
+        }
+
+        public boolean isAWSCloudHSM() {
+            return AwsCloudHsmCryptoToken.class.getSimpleName().equals(cryptoTokenInfo.getType());
         }
 
         public boolean isRequiresSecretToActivate() {
@@ -493,6 +485,10 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
 
         public boolean isShowSoftCryptoToken() {
             return SoftCryptoToken.class.getSimpleName().equals(getType());
+        }
+
+        public boolean isShowAwsCloudHsmCryptoToken() {
+            return AwsCloudHsmCryptoToken.class.getSimpleName().equals(getType());
         }
 
         public boolean isShowP11CryptoToken() {
@@ -1152,6 +1148,9 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
             } else if (SoftCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType())) {
                 className = SoftCryptoToken.class.getName();
                 properties.setProperty(SoftCryptoToken.NODEFAULTPWD, "true");
+            } else if (AwsCloudHsmCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType())) {
+                className = AwsCloudHsmCryptoToken.class.getName();
+                properties.setProperty(AwsCloudHsmCryptoToken.NODEFAULTPWD, "true");
             } else if (AzureCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType())) {
                 className = AzureCryptoToken.class.getName();
                 final String vaultType = getCurrentCryptoToken().getKeyVaultType().trim();
@@ -1191,8 +1190,9 @@ public class CryptoTokenMBean extends BaseManagedBean implements Serializable {
                     ? getCurrentCryptoToken().getSecret1().toCharArray()
                     : AzureCryptoToken.DUMMY_ACTIVATION_CODE.toCharArray();
             if (getCurrentCryptoTokenId() == 0) {
-                if (secret.length > 0) {
-                    if (getCurrentCryptoToken().isAutoActivate()) {
+                boolean isAwsCloudHsmCryptoToken = AwsCloudHsmCryptoToken.class.getSimpleName().equals(getCurrentCryptoToken().getType());
+                if (secret.length > 0 || isAwsCloudHsmCryptoToken) {
+                    if (getCurrentCryptoToken().isAutoActivate() || isAwsCloudHsmCryptoToken) {
                         BaseCryptoToken.setAutoActivatePin(properties, new String(secret), true);
                     }
                     currentCryptoTokenId = cryptoTokenManagementSession.createCryptoToken(authenticationToken, name, className, properties, null, secret);

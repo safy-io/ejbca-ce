@@ -491,6 +491,8 @@
 		<fileset dir="${ejbca.home}/lib" includes="el-impl-2.2.jar"/>
 	</path>
 
+	<path id="lib.cloudhsm-jce.classpath"><fileset dir="${ejbca.home}/lib"><include name="cloudhsm-jce-*.jar"/></fileset></path>
+
 	<path id="lib.jpa.classpath">
         <fileset dir="${ejbca.home}/lib/hibernate">
             <include name="antlr-*.jar"/>
@@ -623,7 +625,7 @@
 	<condition property="mod.ejbca-rest-system.exists">
 	        <available file="${mod.ejbca-rest-system.path}/build.xml"/>
 	 </condition>
-    
+
     <condition property="mod.statedump.exists">
         <available file="${mod.statedump.path}/build.xml" />
     </condition>

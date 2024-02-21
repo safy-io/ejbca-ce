@@ -233,8 +233,10 @@
                 </h:panelGroup>
                 
 				<h:outputLabel for="currentCryptoTokenAutoActivate"
-					value="#{web.text.CRYPTOTOKEN_AUTO}" />
-				<h:panelGroup>
+					value="#{web.text.CRYPTOTOKEN_AUTO}"
+					rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}" />
+				<h:panelGroup
+					rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}">
 					<h:selectBooleanCheckbox id="currentCryptoTokenAutoActivate"
 						value="#{cryptoTokenMBean.currentCryptoToken.autoActivate}"
 						disabled="#{!cryptoTokenMBean.currentCryptoTokenEditMode}" />
@@ -468,7 +470,8 @@
                 </h:panelGroup>
 
                 <!-- Secret 1 -->
-                <h:panelGroup id="currentCryptoTokenSecret1LabelGroup">
+                <h:panelGroup id="currentCryptoTokenSecret1LabelGroup"
+							  rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}">
                     <h:outputLabel 
                         id="currentCryptoTokenSecret1Label"
                         for="currentCryptoTokenSecret1"
@@ -476,7 +479,8 @@
                         rendered="#{cryptoTokenMBean.currentCryptoTokenEditMode 
                                     and cryptoTokenMBean.currentCryptoToken.requiresSecret}" />
                 </h:panelGroup>
-                <h:panelGroup id="currentCryptoTokenSecret1ValueGroup">
+                <h:panelGroup id="currentCryptoTokenSecret1ValueGroup"
+							  rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}">
                     <h:panelGroup
                         rendered="#{cryptoTokenMBean.currentCryptoTokenEditMode
                                     and cryptoTokenMBean.currentCryptoToken.requiresSecret}">
@@ -491,14 +495,16 @@
                 </h:panelGroup>
                 
                 <!-- Secret 2 -->
-                <h:panelGroup id="currentCryptoTokenSecret2LabelGroup">
+                <h:panelGroup id="currentCryptoTokenSecret2LabelGroup"
+							  rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}">
                     <h:outputLabel for="currentCryptoTokenSecret2"
                         id="currentCryptoTokenSecret2Label"
                         value="#{web.text.CRYPTOTOKEN_PIN_REPEAT}"
                         rendered="#{cryptoTokenMBean.currentCryptoTokenEditMode
                                     and cryptoTokenMBean.currentCryptoToken.requiresSecret}" />
                 </h:panelGroup>
-                <h:panelGroup id="currentCryptoTokenSecret2ValueGroup">
+                <h:panelGroup id="currentCryptoTokenSecret2ValueGroup"
+							  rendered="#{!cryptoTokenMBean.currentCryptoToken.showAwsCloudHsmCryptoToken}">
                     <h:inputSecret id="currentCryptoTokenSecret2"
                         value="#{cryptoTokenMBean.currentCryptoToken.secret2}"
                         rendered="#{cryptoTokenMBean.currentCryptoTokenEditMode 
