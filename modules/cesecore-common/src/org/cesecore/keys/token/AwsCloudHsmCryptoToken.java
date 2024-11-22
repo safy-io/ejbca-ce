@@ -372,7 +372,11 @@ public class AwsCloudHsmCryptoToken extends BaseCryptoToken {
             Constructor<?> constructor = clazz.getConstructor();
             Security.addProvider((Provider) constructor.newInstance());
         } catch (Throwable e) {
-            log.warn("AWS CloudHSM Provider is not available: " + e.getMessage());
+            Throwable cause = e;
+            while (cause.getCause() != null && cause.getCause() != cause) {
+                cause = e.getCause();
+            }
+            log.warn("AWS CloudHSM Provider is not available: " + cause.getMessage());
         }
     }
 }
